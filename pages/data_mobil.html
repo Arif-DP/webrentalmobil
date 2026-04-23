@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Mobil</title>
+</head>
+
+<link rel="stylesheet" href="../assets/css/dashboard_admin.css">
+
+<body>
+    <div class="sidebar" id="sidebar">
+        <h2>Menu</h2>
+        <ul>
+            <li><a href="dashboard_admin.html">Dashboard</a></li>
+            <li><a href="data_mobil.html">Data Mobil</a></li>
+            <li><a href="data_pelanggan.html">Data Pelanggan</a></li>
+            <li><a href="transaksi_rental.html">Transaksi Rental</a></li>
+            <li><a href="laporan.html">Laporan</a></li>
+        </ul>
+    </div>
+
+    <div class="main" id="main">
+        <div class="navbar">
+            <div class="navbar-left">
+                <button id="toggleBtn">☰</button>
+
+                <img src="../assets/img/logo2.png" alt="Logo" class="logo">
+                <h2 class="brand">Arif Car Rental</h2>
+            </div>
+            <div>
+                <a href="../index.html">Logout</a>
+            </div>
+        </div>
+
+        <div class="content">
+        <h3 class="data-mobil">Data Mobil</h3>
+        <div class="form-container">
+            <input type="text" id="merk" placeholder="Merk Mobil">
+            <input type="text" id="model" placeholder="Model">
+            <input type="text" id="tahun" placeholder="Tahun Mobil">
+            <input type="text" id="plat" placeholder="Plat Nomor">
+            <input type="number" id="harga" placeholder="Harga per Hari">
+            <button onclick="tambahMobil()">Tambah Mobil</button>
+        </div>
+
+        <table id="tabelMobil">
+            <thead>
+                <tr>
+                    <th>Merk</th>
+                    <th>Model</th>
+                    <th>Tahun Mobil</th>
+                    <th>Plat Nomor</th>
+                    <th>Harga/Hari</th>
+                    <th>Edit</th>
+                    <th>Hapus</th>
+                </tr>
+            </thead>
+            <tbody id="bodyTabel">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.getElementById('toggleBtn').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        const DB = {
+            get: function(key) {
+                return JSON.parse(localStorage.getItem(key)) || [];
+            },
+            save: function(key, data) {
+                localStorage.setItem(key, JSON.stringify(data));
+            }
+        };
+
+        let editIndex = -1;
+
+        renderTable();
+
+        function renderTable() {
+            const tbody = document.getElementById('bodyTabel');
+            const data = DB.get('mobil') || [];
+
+            tbody.innerHTML = '';
+
+            data.forEach((mobil, index) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${mobil.merk}</td>
+                        <td>${mobil.model}</td>
+                        <td>${mobil.tahun}</td>
+                        <td>${mobil.plat}</td>
+                        <td>Rp ${parseInt(mobil.harga).toLocaleString('id-ID')}</td>
+                        <td><button onclick="editMobil(${index})">Edit</button></td>
+                        <td><button onclick="hapusMobil(${index})">Hapus</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function tambahMobil() {
+            const merk = document.getElementById('merk')
+            const model = document.getElementById('model')
+            const tahun = document.getElementById('tahun')
+            const plat = document.getElementById('plat')
+            const harga = document.getElementById('harga')
+
+            let data = DB.get('mobil') || [];
+            
+            if(!merk.value || !model.value || !tahun.value || !plat.value || !harga.value) {
+                alert("Harap isi semua field!");
+                return;
+
+            }   
+            
+            if (editIndex === -1) {
+                data.push({
+                    merk: merk.value,
+                    model: model.value,
+                    tahun: tahun.value,
+                    plat: plat.value,
+                    harga: harga.value
+                });
+            } else {
+                data[editIndex] = {
+                    merk: merk.value,
+                    model: model.value,
+                    tahun: tahun.value,
+                    plat: plat.value,
+                    harga: harga.value
+                };
+                editIndex = -1;
+                document.querySelector("button[onclick='tambahMobil()']").innerText = "Tambah Mobil";
+            }        
+
+            DB.save('mobil', data);
+            renderTable();
+            
+            merk.value = '';
+            model.value = '';
+            tahun.value = '';
+            plat.value = '';
+            harga.value = '';
+        }
+
+        function editMobil(index) {
+            const data = DB.get('mobil') || [];
+
+            const m = data[index];
+
+            document.getElementById('merk').value = m.merk;
+            document.getElementById('model').value = m.model;
+            document.getElementById('tahun').value = m.tahun;
+            document.getElementById('plat').value = m.plat;
+            document.getElementById('harga').value = m.harga;
+
+            editIndex = index;
+
+            document.querySelector("button[onclick='tambahMobil()']").innerText = "Update Mobil";
+        }
+
+        function hapusMobil(index) {
+            if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
+                let data = DB.get('mobil') || [];
+
+                data.splice(index, 1);
+
+                DB.save('mobil', data);
+                renderTable();
+            }
+        }
+
+    </script>
+</body>
+</html>

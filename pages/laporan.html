@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaksi Rental</title>
+</head>
+
+<link rel="stylesheet" href="../assets/css/dashboard_admin.css">
+
+<body>
+    <div class="sidebar" id="sidebar">
+        <h2>Menu</h2>
+        <ul>
+            <li><a href="dashboard_admin.html">Dashboard</a></li>
+            <li><a href="data_mobil.html">Data Mobil</a></li>
+            <li><a href="data_pelanggan.html">Data Pelanggan</a></li>
+            <li><a href="transaksi_rental.html">Transaksi Rental</a></li>
+            <li><a href="laporan.html">Laporan</a></li>
+        </ul>
+    </div>
+
+    <div class="main" id="main">
+        <div class="navbar">
+            <div class="navbar-left">
+                <button id="toggleBtn">☰</button>
+
+                <img src="../assets/img/logo2.png" alt="Logo" class="logo">
+                <h2 class="brand">Arif Car Rental</h2>
+            </div>
+            <div>
+                <a href="../index.html">Logout</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <h3>Laporan Keuangan & Statistik</h3>
+            
+            <div class="card-grid">
+                <div class="card blue">
+                    <h4>Total Transaksi</h4>
+                    <p id="totalTransaksi">0</p>
+                </div>
+                <div class="card green">
+                    <h4>Total Pendapatan</h4>
+                    <p id="totalPendapatan">Rp 0</p>
+                </div>
+            </div>
+
+            <table id="tabelLaporan">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Tanggal</th>
+                        <th>Pelanggan</th>
+                        <th>Mobil</th>
+                        <th>Durasi</th>
+                        <th>Total Harga</th>
+                    </tr>
+                </thead>
+                <tbody id="bodyLaporan"></tbody>
+            </table>
+
+            <button onclick="window.print()" class="btn-print">Cetak Laporan</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('toggleBtn').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        const DB = {
+            get: function(key) {
+                return JSON.parse(localStorage.getItem(key)) || [];
+            },
+            save: function(key, data) {
+                localStorage.setItem(key, JSON.stringify(data));
+            }
+        };
+
+        function renderLaporan() {
+            const tbody = document.getElementById('bodyLaporan');
+            const dataLaporan = DB.get('transaksi') || [];
+            
+            let totalPendapatan = 0;
+            tbody.innerHTML = '';
+
+            dataLaporan.sort((a, b) => {
+                return new Date(b.tanggal || 0) - new Date(a.tanggal || 0);
+            });
+
+
+            dataLaporan.forEach((item, index) => {
+                const hargaTotal = parseInt(item.totalHarga) || 0;
+                totalPendapatan += hargaTotal;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${item.tanggal}</td>
+                        <td>${item.pelanggan}</td>
+                        <td>${item.mobil} ${item.model || ''}</td>
+                        <td>${item.durasi} Hari</td>
+                        <td>Rp ${hargaTotal.toLocaleString('id-ID')}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('totalTransaksi').innerText = dataLaporan.length;
+            document.getElementById('totalPendapatan').innerText = "Rp " + totalPendapatan.toLocaleString('id-ID');
+        }
+
+        renderLaporan();
+    </script>
+</body>
+</html>

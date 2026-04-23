@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arif Car Rental</title>
+</head>
+
+<link rel="stylesheet" href="assets/css/style.css">
+
+<body>
+
+    <div class="navbar">
+        <div class="navbar-left">
+            <img src="assets/img/logo2.png" alt="Logo" class="logo">
+            <h2 class="brand">Arif Car Rental</h2>
+        </div>
+        <div>
+            <a href="login.html">Login</a>
+        </div>
+    </div>
+
+    <div class="hero", id="hero">
+        <h1 id="judul">Selamat Datang</h1>
+        <p>Tempat Rental Mobil Terbaik, Bagus dan Murah!!</p>
+        <button class="btn" onclick="mulai()">
+            Mulai Sekarang
+        </button>
+    </div>
+
+    <div class="footer">
+        <p= id="tahun"></p>
+    </div>
+    <script>
+        window.onload = function() {
+           document.getElementById("hero").classList.add("show");
+
+           document.getElementById("tahun").innerHTML = 
+           "© " + new Date().getFullYear() + " Arif Car Rental";
+
+        }
+
+        function mulai() { alert("Silakan login terlebih dahulu!"); 
+        window.location.href = "login.html"; 
+        }
+
+        let teks = ["Selamat Datang", "Rental Mobil Terbaik", "Murah & Bagus"]; 
+        let i = 0;
+
+        setInterval(() => { 
+            document.getElementById("judul").innerHTML = teks[i]; 
+            i = (i + 1) % teks.length; 
+        }, 3000);
+    </script>
+</body>
+</html>

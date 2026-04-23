@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Pelanggan</title>
+</head>
+
+<link rel="stylesheet" href="../assets/css/dashboard_admin.css">
+
+<body>
+    <div class="sidebar" id="sidebar">
+        <h2>Menu</h2>
+        <ul>
+            <li><a href="dashboard_admin.html">Dashboard</a></li>
+            <li><a href="data_mobil.html">Data Mobil</a></li>
+            <li><a href="data_pelanggan.html">Data Pelanggan</a></li>
+            <li><a href="transaksi_rental.html">Transaksi Rental</a></li>
+            <li><a href="laporan.html">Laporan</a></li>
+        </ul>
+    </div>
+
+    <div class="main" id="main">
+        <div class="navbar">
+            <div class="navbar-left">
+                <button id="toggleBtn">☰</button>
+
+                <img src="../assets/img/logo2.png" alt="Logo" class="logo">
+                <h2 class="brand">Arif Car Rental</h2>
+            </div>
+            <div>
+                <a href="../index.html">Logout</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <h3>Data Pelanggan</h3>
+    
+            <div class="form-container">
+                <input type="text" id="nama" placeholder="Nama Lengkap">
+                <input type="email" id="email" placeholder="Email">
+                <input type="text" id="telepon" placeholder="Nomor Telepon">
+                <button onclick="tambahPelanggan()">Tambah Pelanggan</button>
+            </div>
+
+            <table id="tabelPelanggan">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Email</th>
+                        <th>Telepon</th>
+                        <th>Edit</th>
+                        <th>Hapus</th>
+                    </tr>
+                </thead>
+                <tbody id="bodyPelanggan">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('toggleBtn').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+            const DB = {
+                get: function(key) {
+                    return JSON.parse(localStorage.getItem(key)) || [];
+                },
+                save: function(key, data) {
+                    localStorage.setItem(key, JSON.stringify(data));
+                }
+            };
+
+            let editIndex = -1;
+
+            function renderPelanggan() {
+                const tbody = document.getElementById('bodyPelanggan');
+                const data = DB.get('pelanggan') || [];
+
+                tbody.innerHTML = '';
+
+                data.forEach((pelanggan, index) => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${pelanggan.nama}</td>
+                            <td>${pelanggan.email}</td>
+                            <td>${pelanggan.telepon}</td>
+                            <td><button onclick="editPelanggan(${index})">Edit</button></td>
+                            <td><button onclick="hapusPelanggan(${index})">Hapus</button></td>
+                        </tr>
+                    `;
+                });
+            }
+
+            window.onload = renderPelanggan;
+
+            function tambahPelanggan() {
+                const nama = document.getElementById('nama').value;
+                const email = document.getElementById('email').value;
+                const telepon = document.getElementById('telepon').value;
+
+                let data = DB.get('pelanggan') || [];
+
+                if(!nama || !email || !telepon) {
+                    alert("Semua kolom wajib diisi!");
+                    return;
+                }
+
+                if (editIndex === -1) {
+            
+                    data.push({ nama, email, telepon });
+
+                } else {
+                
+                        data[editIndex] = { nama, email, telepon };
+                        editIndex = -1;
+
+                        document.querySelector("button[onclick='tambahPelanggan()']").innerText = "Tambah Pelanggan";
+                    }
+
+                DB.save('pelanggan', data);
+                renderPelanggan();
+
+                document.getElementById('nama').value = '';
+                document.getElementById('email').value = '';
+                document.getElementById('telepon').value = '';
+            }
+
+            function editPelanggan(index) {
+                const data = DB.get('pelanggan') || [];
+
+                document.getElementById('nama').value = data[index].nama;
+                document.getElementById('email').value = data[index].email;
+                document.getElementById('telepon').value = data[index].telepon;
+
+                editIndex = index;
+                document.querySelector("button[onclick='tambahPelanggan()']").innerText = "Update Pelanggan";
+            }
+
+            function hapusPelanggan(index) {
+                if (confirm("Yakin ingin menghapus data pelanggan ini?")) {
+
+                    let data = DB.get('pelanggan') || [];
+
+                    data.splice(index, 1);
+
+                    DB.save("pelanggan", data);
+                    renderPelanggan();
+                }
+            }
+    </script>
+</body>
